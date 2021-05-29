@@ -1,14 +1,13 @@
-import peg from 'pegjs';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './util';
 
-const parser: peg.Parser = require('./parser');
+import * as parser from './parser';
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string): MfmNode[] {
-	const nodes = parser.parse(input, { startRule: 'fullParser' });
+	const nodes = parser.parseFull(input);
 	return nodes;
 }
 
@@ -16,7 +15,7 @@ export function parse(input: string): MfmNode[] {
  * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
-	const nodes = parser.parse(input, { startRule: 'plainParser' });
+	const nodes = parser.parsePlain(input);
 	return nodes;
 }
 
