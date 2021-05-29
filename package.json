@@ -5,11 +5,7 @@
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "scripts": {
-    "build": "npm run tsc && npm run peg",
-    "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "pegjs -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser.pegjs",
-    "peg-debug": "pegjs -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser.pegjs",
-    "tsc": "tsc",
+    "build": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
     "parse-plain": "node ./built/cli/parsePlain",
