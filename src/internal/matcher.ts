@@ -18,6 +18,9 @@ export type SuccessMatcher = (ctx: MatcherContext, pos: number) => MatcherResult
 
 export type Matcher = (ctx: MatcherContext, pos: number) => MatcherResult;
 
+/**
+ * Creates a matching success object.
+*/
 export function success(length: number, data?: any): MatcherResultSuccess {
 	return {
 		success: true,
@@ -29,10 +32,17 @@ export function success(length: number, data?: any): MatcherResultSuccess {
 const failObject: MatcherResultFail = {
 	success: false
 };
+
+/**
+ * Creates a matching failure object.
+*/
 export function fail(): MatcherResultFail {
 	return failObject;
 }
 
+/**
+ * Generates a new matcher of repetition matching.
+*/
 export function repetition(atLeast: 0, matcher: Matcher): SuccessMatcher
 export function repetition(atLeast: number, matcher: Matcher): Matcher
 export function repetition(atLeast: number, matcher: Matcher) {
@@ -52,6 +62,9 @@ export function repetition(atLeast: number, matcher: Matcher) {
 	};
 }
 
+/**
+ * Generates a new matcher of prioritized choice.
+*/
 export function choice(matchers: Matcher[]): Matcher {
 	return (ctx: MatcherContext, pos: number) => {
 		for (const matcher of matchers) {
