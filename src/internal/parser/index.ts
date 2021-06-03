@@ -1,6 +1,6 @@
 import { mergeText } from '../util';
 import { BOLD, FN, MfmInline, MfmNode, MfmPlainNode } from '../../node';
-import { choice, ParserContext, ParserResult, repetition } from './lib';
+import { choice, define, ParserContext, ParserResult, repetition } from './lib';
 
 export function parseFull(input: string): MfmNode[] {
 	const ctx = new ParserContext(input);
@@ -29,7 +29,7 @@ export function parseFull(input: string): MfmNode[] {
 		textParser
 	]));
 
-	if (!ctx.call(parser)) {
+	if (!parser(ctx)) {
 		throw new Error('parsing error');
 	}
 
@@ -44,14 +44,14 @@ export function parsePlain(input: string): MfmPlainNode[] {
 		unicodeEmojiParser,
 		textParser
 	]));
-	if (!ctx.call(parser)) {
+	if (!parser(ctx)) {
 		throw new Error('parsing error');
 	}
 
 	return mergeText(ctx.result) as MfmPlainNode[];
 }
 
-function inlineParser(ctx: ParserContext): ParserResult {
+const inlineParser = define((ctx) => {
 	const parser = choice([
 		emojiCodeParser,
 		unicodeEmojiParser,
@@ -70,64 +70,64 @@ function inlineParser(ctx: ParserContext): ParserResult {
 		fnVer1Parser,
 		textParser
 	]);
-	return ctx.call(parser);
-}
+	return parser(ctx);
+});
 
 //
 // blocks
 //
 
-function quoteParser(ctx: ParserContext): ParserResult {
+const quoteParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function searchParser(ctx: ParserContext): ParserResult {
+const searchParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function codeBlockParser(ctx: ParserContext): ParserResult {
+const codeBlockParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function mathBlockParser(ctx: ParserContext): ParserResult {
+const mathBlockParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function centerParser(ctx: ParserContext): ParserResult {
+const centerParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function emojiCodeParser(ctx: ParserContext): ParserResult {
+const emojiCodeParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function unicodeEmojiParser(ctx: ParserContext): ParserResult {
+const unicodeEmojiParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function bigParser(ctx: ParserContext): ParserResult {
+const bigParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
 /*
  * bold = "**" (!"**" inline)+ "**"
 */
-function boldParser(ctx: ParserContext): ParserResult {
+const boldParser = define((ctx) => {
 	if (ctx.read(2) != '**') {
 		return ctx.fail();
 	}
 
 	const content: any[] = [];
 	while (ctx.seek(2) != '**') {
-		if (!ctx.call(inlineParser)) break;
+		if (!inlineParser(ctx)) break;
 		content.push(ctx.result);
 	}
 	if (content.length < 1) {
@@ -138,53 +138,52 @@ function boldParser(ctx: ParserContext): ParserResult {
 		return ctx.fail();
 	}
 	return ctx.ok(BOLD(mergeText(content) as MfmInline[]));
-}
+});
 
-
-function smallParser(ctx: ParserContext): ParserResult {
+const smallParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function italicParser(ctx: ParserContext): ParserResult {
+const italicParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function strikeParser(ctx: ParserContext): ParserResult {
+const strikeParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function inlineCodeParser(ctx: ParserContext): ParserResult {
+const inlineCodeParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function mathInlineParser(ctx: ParserContext): ParserResult {
+const mathInlineParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function mentionParser(ctx: ParserContext): ParserResult {
+const mentionParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function hashtagParser(ctx: ParserContext): ParserResult {
+const hashtagParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function urlParser(ctx: ParserContext): ParserResult {
+const urlParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
-function linkParser(ctx: ParserContext): ParserResult {
+const linkParser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
 /**
  * fnVer1 = "[" name:$([a-z0-9_]i)+ args:fnArgs? _ content:fnContentPart+ "]"
@@ -200,19 +199,19 @@ function fnVer1Parser(ctx: ParserContext): ParserResult {
 	return ctx.fail();
 }
 
-function fnVer2Parser(ctx: ParserContext): ParserResult {
+const fnVer2Parser = define((ctx) => {
 	// TODO
 	return ctx.fail();
-}
+});
 
 /*
  * text = .
 */
-function textParser(ctx: ParserContext): ParserResult {
+const textParser = define((ctx) => {
 	const c = ctx.read(1);
 	if (c.length == 0) {
 		return ctx.fail();
 	}
 
 	return ctx.ok(c);
-}
+});

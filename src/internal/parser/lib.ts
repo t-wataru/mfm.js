@@ -42,16 +42,18 @@ export class ParserContext {
 	fail(): false {
 		return false;
 	}
+}
 
-	call(handler: ParserHnadler): ParserResult {
-		const originalPos = this.pos;
-		const success = handler(this);
+export function define(handler: ParserHnadler) {
+	return (ctx: ParserContext) => {
+		const originalPos = ctx.pos;
+		const success = handler(ctx);
 		if (!success) {
 			// backtrack
-			this.pos = originalPos;
+			ctx.pos = originalPos;
 		}
 		return success;
-	}
+	};
 }
 
 /**
@@ -62,13 +64,8 @@ export function repetition(atLeast: number, handler: ParserHnadler): ParserHnadl
 		let count = 0;
 		const content: any[] = [];
 		while (true) {
-			const originalPos = ctx.pos;
 			const success = handler(ctx);
-			if (!success) {
-				// backtrack
-				ctx.pos = originalPos;
-				break;
-			}
+			if (!success) break;
 			content.push(ctx.result);
 			count++;
 		}
@@ -83,12 +80,7 @@ export function repetition(atLeast: number, handler: ParserHnadler): ParserHnadl
 export function choice(handlers: ParserHnadler[]): ParserHnadler {
 	return (ctx: ParserContext) => {
 		for (const handler of handlers) {
-			const originalPos = ctx.pos;
-			if (handler(ctx)) {
-				return true;
-			}
-			// backtrack
-			ctx.pos = originalPos;
+			if (handler(ctx)) return true;
 		}
 		return false;
 	};
