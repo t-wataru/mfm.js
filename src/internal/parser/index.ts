@@ -194,10 +194,99 @@ const linkParser = define((ctx) => {
  * fnContentPart = !("]") i:inlineWithoutFn { return i; }
  * 
 */
-function fnVer1Parser(ctx: ParserContext): ParserResult {
-	// TODO
-	return ctx.fail();
-}
+const fnVer1Parser = define((ctx) => {
+	// "["
+	if (ctx.read(1) != '[') {
+		return ctx.fail();
+	}
+
+	// name
+	let name = '';
+	while (/^[a-z0-9_]$/i.test(ctx.seek(1))) {
+		name += ctx.read(1);
+	}
+	if (name.length == 0) return ctx.fail();
+
+	// args (option)
+	const args = fnArgsParser(ctx) ? ctx.result as Record<string, any> : { };
+
+	// space
+	if (!/^[ 　\t\u00a0]$/.test(ctx.read(1))) {
+		return ctx.fail();
+	}
+
+	// content
+	const content: any[] = [];
+	while (ctx.seek(1) != ']') {
+		const success = inlineParser(ctx);
+		if (!success) break;
+		content.push(ctx.result);
+	}
+	if (content.length < 1) return ctx.fail();
+
+	// "]"
+	if (ctx.read(1) != ']') {
+		return ctx.fail();
+	}
+
+	return ctx.ok(FN(name, args, mergeText(content) as MfmInline[]));
+});
+
+const fnArgsParser = define((ctx) => {
+	// "."
+	if (ctx.read(1) != '.') {
+		return ctx.fail();
+	}
+
+	if (!fnArgParser(ctx)) return ctx.fail();
+	const head = ctx.result;
+
+	const tailsParser = repetition(0, define(c => {
+		if (c.read(1) != ',') return c.fail();
+		if (!fnArgParser(c)) return c.fail();
+		return c.ok(c.result);
+	}));
+	tailsParser(ctx);
+	const tails: any[] = ctx.result;
+
+	const args: Record<string, any> = { };
+	for (const pair of [head, ...tails]) {
+		args[pair.k] = pair.v;
+	}
+
+	return ctx.ok(args);
+});
+
+const fnArgParser = define((ctx) => {
+
+	// key
+	let key = '';
+	while (/^[a-z0-9_]$/i.test(ctx.seek(1))) {
+		key += ctx.read(1);
+	}
+	if (key.length < 1) return ctx.fail();
+
+	const valueParser = define(c => {
+		// "="
+		if (c.read(1) != '=') {
+			return c.fail();
+		}
+
+		// value
+		let v = '';
+		while (/^[a-z0-9_]$/i.test(c.seek(1))) {
+			v += c.read(1);
+		}
+		if (v.length < 1) return c.fail();
+
+		return c.ok(v);
+	});
+
+	// value (option)
+	const value = valueParser(ctx) ? ctx.result : true;
+
+	return ctx.ok({ k: key, v: value });
+});
 
 const fnVer2Parser = define((ctx) => {
 	// TODO
