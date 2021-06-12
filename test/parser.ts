@@ -1,7 +1,7 @@
 import assert from 'assert';
 import * as mfm from '../built/index';
 import {
-	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE
+	TEXT, CENTER, FN, UNI_EMOJI, MENTION, EMOJI_CODE, HASHTAG, N_URL, BOLD, SMALL, ITALIC, STRIKE, QUOTE, MATH_BLOCK, SEARCH, CODE_BLOCK, LINK, INLINE_CODE, MATH_INLINE
 } from '../built/index';
 
 describe('PlainParser', () => {
@@ -126,6 +126,20 @@ describe('FullParser', () => {
 			const input = `> `;
 			const output = [
 				TEXT('> ')
+			];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+		it('引用ブロックの後ろの空行は無視される', () => {
+			const input = `
+> foo
+> bar
+
+hoge`;
+			const output = [
+				QUOTE([
+					TEXT('foo\nbar')
+				]),
+				TEXT('hoge')
 			];
 			assert.deepStrictEqual(mfm.parse(input), output);
 		});
@@ -542,7 +556,15 @@ describe('FullParser', () => {
 		});
 	});
 
-	// strike
+	describe('strike', () => {
+		it('basic', () => {
+			const input = '~~foo~~';
+			const output = [STRIKE([
+				TEXT('foo')
+			])];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('inlineCode', () => {
 		it('basic', () => {
@@ -564,7 +586,13 @@ describe('FullParser', () => {
 		});
 	});
 
-	// mathInline
+	describe('mathInline', () => {
+		it('basic', () => {
+			const input = '\\(x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}\\)';
+			const output = [MATH_INLINE('x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}')];
+			assert.deepStrictEqual(mfm.parse(input), output);
+		});
+	});
 
 	describe('mention', () => {
 		it('basic', () => {

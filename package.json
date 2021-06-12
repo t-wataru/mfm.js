@@ -1,14 +1,14 @@
 {
   "name": "mfm-js",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "An MFM parser implementation with PEG.js",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "scripts": {
     "build": "npm run tsc && npm run peg",
     "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "peggy --cache --plugin ./built/plugin.js -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/parser.pegjs",
-    "peg-debug": "peggy --cache --plugin ./built/plugin.js -o built/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/parser.pegjs",
+    "peg": "peggy --cache --plugin ./built/plugin.js -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/internal/parser.pegjs",
+    "peg-debug": "peggy --cache --plugin ./built/plugin.js -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/internal/parser.pegjs",
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
@@ -31,7 +31,7 @@
     "typescript": "4.2.x"
   },
   "dependencies": {
-    "twemoji-parser": "13.0.x"
+    "twemoji-parser": "13.1.x"
   },
   "files": [
     "built"
