@@ -5,10 +5,8 @@
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "scripts": {
-    "build": "npm run tsc && npm run peg",
-    "build-debug": "npm run tsc && npm run peg-debug",
-    "peg": "peggy --cache -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser src/internal/parser.pegjs",
-    "peg-debug": "peggy --cache -o built/internal/parser.js --allowed-start-rules fullParser,inlineParser,plainParser --trace src/internal/parser.pegjs",
+    "build": "npm run tsc",
+    "build-debug": "npm run tsc",
     "tsc": "tsc",
     "tsd": "tsd",
     "parse": "node ./built/cli/parse",
@@ -24,8 +22,8 @@
   "devDependencies": {
     "@types/mocha": "8.2.x",
     "@types/node": "14.14.x",
+    "jison": "0.4.18",
     "mocha": "8.3.x",
-    "peggy": "1.2.0",
     "ts-node": "9.1.x",
     "tsd": "^0.14.0",
     "typescript": "4.2.x"

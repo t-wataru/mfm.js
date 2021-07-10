@@ -1,23 +1,22 @@
-import peg from 'peggy';
+// import peg from 'peggy';
 import { MfmNode, MfmPlainNode } from './node';
 import { stringifyNode, stringifyTree, inspectOne } from './internal/util';
 
-const parser: peg.Parser = require('./internal/parser');
+import * as parser from './internal/parser';
+// const parser: peg.Parser = require('./internal/parser');
 
 /**
  * Generates a MfmNode tree from the MFM string.
 */
 export function parse(input: string): MfmNode[] {
-	const nodes = parser.parse(input, { startRule: 'fullParser' });
-	return nodes;
+	return parser.parseFull(input);
 }
 
 /**
  * Generates a MfmNode tree of plain from the MFM string.
 */
 export function parsePlain(input: string): MfmPlainNode[] {
-	const nodes = parser.parse(input, { startRule: 'plainParser' });
-	return nodes;
+	return parser.parsePlain(input);
 }
 
 /**
