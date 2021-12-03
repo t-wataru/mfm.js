@@ -100,6 +100,7 @@ full
 	/ mention
 	/ hashtag
 	/ url
+	/ fn_dallar
 	/ fn
 	/ link
 	/ search // block
@@ -118,6 +119,7 @@ inline
 	/ mention
 	/ hashtag
 	/ url
+	/ fn_dallar
 	/ fn
 	/ link
 	/ inlineText
@@ -417,9 +419,15 @@ linkLabelPart
 	/ !"]" @inline
 
 // inline: fn
+fn_dallar
+	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
+{
+	args = args || {};
+	return FN(name, args, mergeText(content));
+}
 
 fn
-	= "$[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
+	= "[" name:$([a-z0-9_]i)+ &{ return ensureFnName(name); } args:fnArgs? _ content:(!("]") @inline)+ "]"
 {
 	args = args || {};
 	return FN(name, args, mergeText(content));
